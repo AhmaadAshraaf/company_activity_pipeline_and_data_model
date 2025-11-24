@@ -49,9 +49,3 @@ Once the Azure environment is fully configured, the pipeline runs in a simple da
 - `scripts/fetch_product_usage.py` — ingestion script (reads env or Key Vault).
 - `adf/diagram.mmd` — Mermaid diagram for ADF flow.
 - `samples/` — sample CRM CSV and product API JSON.
-
----
-
-## Notes
-- Secrets: recommended to store API_KEY, BLOB_CONN_STR, SQL_CONN_STR in Key Vault and grant Managed Identity to ADF/Function.
-- For demo without real API key, use `samples/product_api_sample.json` and the helper script to load to blob / staging.
