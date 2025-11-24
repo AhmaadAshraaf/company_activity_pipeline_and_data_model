@@ -1,0 +1,4 @@
+.env
+*.pyc
+__pycache__/
+samples_output/
