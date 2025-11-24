@@ -1,0 +1,8 @@
+{
+  "items": [
+    {"company_id": "c_001", "active_users": 12, "events": 120, "ts": "2025-11-23T00:00:00Z"},
+    {"company_id": "c_002", "active_users": 5, "events": 22, "ts": "2025-11-23T00:00:00Z"},
+    {"company_id": "c_003", "active_users": 0, "events": 0, "ts": "2025-11-23T00:00:00Z"}
+  ],
+  "next_page": null
+}
