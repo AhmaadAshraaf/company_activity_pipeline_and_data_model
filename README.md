@@ -10,23 +10,36 @@ This repo contains:
 - sample input files for local/cloud demo
 
 ---
+## Running the Pipeline (Overview)
 
-## Quick steps (Azure cloud demo)
+Once the Azure environment is fully configured, the pipeline runs in a simple daily cycle. The CRM file is processed first to ensure company metadata is fresh, then the product-usage data is ingested, and finally all pieces are merged into the analytics table. The steps below outline the flow with brief details on what each stage accomplishes.
 
-1. Copy `.env.template` → `.env` and fill values (or add secrets into Azure Key Vault).
-2. Create Azure resources:
-   - Storage account + containers `raw/crm/` and `product-api-raw`.
-   - Azure SQL database (or Synapse) and a user with DB privileges.
-   - (Optional) Azure Key Vault for secrets.
-3. Run SQL DDL on Azure SQL:
-   - Run `sql/create_tables.sql` to create staging, dim and analytics tables.
-4. Upload `samples/crm_sample.csv` to blob container `raw/crm/` OR use the helper to insert into `stg.crm_companies`.
-5. Run ingestion script to write NDJSON to blob:
-   - `python scripts/fetch_product_usage.py --start 2025-11-23 --end 2025-11-23`
-   - (Script reads secrets from env or Key Vault.)
-6. Use ADF or the helper `scripts/load_samples_to_sql.py` to copy NDJSON from blob into `stg.product_usage`.
-7. Run `sql/populate_analytics.sql` (or call the stored proc) to merge and compute derived metrics.
-8. Query `analytics.company_activity_daily` to verify.
+- **Load environment variables or Key Vault secrets**  
+  Ensure the API URL, keys, and connection strings are available to both the ingestion script and SQL processes. This keeps configuration separate from code and avoids hard-coded credentials.
+
+- **Upload the daily CRM CSV to `raw/crm/` and ingest it into `stg.crm_companies`**  
+  This step brings in the latest company attributes (name, country, industry tag, last contact date) and acts as the foundation for the day’s analytics.
+
+- **Merge CRM data into `dim.companies`**  
+  Run the CRM MERGE block to refresh company metadata. This ensures any renamed or newly added companies appear correctly in downstream tables.
+
+- **Run the product-usage ingestion script for the target date**  
+  Executing  
+  `python scripts/fetch_product_usage.py --start <date> --end <date>`  
+  fetches the day’s product-usage activity and writes NDJSON files into the `product-api-raw` container, already partitioned by date.
+
+- **Load NDJSON into `stg.product_usage`**  
+  Using ADF or the helper loader script, copy the raw NDJSON files into the staging table. This keeps raw data and structured data clearly separated.
+
+- **Execute the analytics merge script**  
+  Running `sql/populate_analytics.sql` creates or updates the row for each company on that day. It also calculates rolling windows and derived metrics like engagement consistency, usage density, and churn-risk flags.
+
+- **Validate output for the target date**  
+  Run a quick SQL check to confirm row counts and look at a few sample rows. This makes sure the ingestion and merge steps behaved as expected.
+
+- **Confirm the run and trigger standard notifications**  
+  Once checks look correct, let ADF complete its success notification (email/Teams/webhook). The pipeline is then ready for the next cycle.
+
 
 ---
 
