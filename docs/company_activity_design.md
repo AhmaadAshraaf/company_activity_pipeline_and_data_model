@@ -25,5 +25,5 @@ Columns:
 - `created_at`, `updated_at` (DATETIME)
 
 ## Monitoring & data quality
-- data_quality_flag set during staging and merge.
+- `data_quality_flag` set during staging and merge.
 - pipeline failure alerts routed to Teams/email from ADF/Logic App.
