@@ -6,6 +6,7 @@ This repo contains:
 - schema DDL and merge SQL (Azure SQL / Synapse T-SQL)
 - Python ingestion script that writes NDJSON to Azure Blob (uses env or Key Vault)
 - ADF architecture diagram
+- A backup plan if I have only 30 minutes to get the pipeline ready for deployment
 - sample input files for local/cloud demo
 
 ---
