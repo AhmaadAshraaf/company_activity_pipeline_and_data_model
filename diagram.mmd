@@ -1,0 +1,31 @@
+flowchart TD
+  subgraph LinkedServices
+    LS1[ls_blob_storage]
+    LS2[ls_azure_sql]
+    LS3[ls_keyvault]
+  end
+
+  subgraph Pipeline["pl-company-activity-daily"]
+    A1[getmeta_crm_file]
+    A2[act-copy-crm-to-stg]
+    A3[act-trigger_api_ingest]
+    A4[act-copy-product-raw-to-stg]
+    A5[act-sp_merge_analytics]
+    A6[act-notify_success]
+    AF[act-notify_failure]
+  end
+
+  LS1 --> A1
+  A1 -->|file exists| A2
+  A2 --> LS2
+  A2 --> A3
+  A3 --> LS1
+  A3 --> A4
+  A4 --> LS2
+  A4 --> A5
+  A5 --> A6
+  A1 -- failure --> AF
+  A2 -- failure --> AF
+  A3 -- failure --> AF
+  A4 -- failure --> AF
+  A5 -- failure --> AF
