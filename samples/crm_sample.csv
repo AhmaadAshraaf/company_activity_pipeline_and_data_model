@@ -1,0 +1,4 @@
+company_id,name,country,industry_tag,last_contact_at,file_date,src_file_name
+c_001,Acme Corp,US,manufacturing,2025-10-10T12:00:00Z,2025-11-23,sample_crm_2025-11-23.csv
+c_002,Bits & Bytes,UK,software,2025-11-01T09:30:00Z,2025-11-23,sample_crm_2025-11-23.csv
+c_003,Green Farm,EG,agriculture,2025-09-15T08:00:00Z,2025-11-23,sample_crm_2025-11-23.csv
