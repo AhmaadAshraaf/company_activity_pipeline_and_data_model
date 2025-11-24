@@ -6,7 +6,7 @@ flowchart TD
   end
 
   subgraph Pipeline["pl-company-activity-daily"]
-    A1[getmeta_crm_file]
+    A1[get_meta_crm_file]
     A2[act-copy-crm-to-stg]
     A3[act-trigger_api_ingest]
     A4[act-copy-product-raw-to-stg]
