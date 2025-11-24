@@ -3,7 +3,7 @@
 **Grain:** one row per `company_id` per `activity_date` (daily)
 
 ## Key table: `analytics.company_activity_daily`
-Columns (short reason):
+Columns:
 - `company_id` (VARCHAR) — join key; PK part 1
 - `activity_date` (DATE) — PK part 2; partition column
 - `company_name` (VARCHAR) — human label for reports
