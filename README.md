@@ -47,5 +47,5 @@ Once the Azure environment is fully configured, the pipeline runs in a simple da
 - `sql/create_tables.sql` — DDL for staging and analytics.
 - `sql/populate_analytics.sql` — upsert + derived metrics.
 - `scripts/fetch_product_usage.py` — ingestion script (reads env or Key Vault).
-- `adf/diagram.mmd` — Mermaid diagram for ADF flow.
+- `adf/diagram.mmd` — diagram for ADF flow.
 - `samples/` — sample CRM CSV and product API JSON.
