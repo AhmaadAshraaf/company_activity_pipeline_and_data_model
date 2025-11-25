@@ -1,4 +1,4 @@
-# Company Activity Pipeline (demo)
+# Company Activity Pipeline
 
 **Short:** Company Activity pipeline — ETL design, SQL transformations, ADF orchestration diagram, and ingestion script for daily company activity analytics.
 
