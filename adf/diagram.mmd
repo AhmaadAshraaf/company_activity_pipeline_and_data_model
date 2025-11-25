@@ -1,31 +1,87 @@
 flowchart TD
-  subgraph LinkedServices
-    LS1[ls_blob_storage]
-    LS2[ls_azure_sql]
-    LS3[ls_keyvault]
+  %% Nodes with short inline explanations (use <br/> for line breaks)
+  subgraph KV[Key Vault]
+    KV1["ls_keyvault<br/><sub>Holds API_KEY, BLOB & SQL secrets</sub>"]
   end
 
-  subgraph Pipeline["pl-company-activity-daily"]
-    A1[get_meta_crm_file]
-    A2[act-copy-crm-to-stg]
-    A3[act-trigger_api_ingest]
-    A4[act-copy-product-raw-to-stg]
-    A5[act-sp_merge_analytics]
-    A6[act-notify_success]
-    AF[act-notify_failure]
+  subgraph LS[Linked Services]
+    LS_blob["ls_blob_storage<br/><sub>Blob storage for raw & processed files</sub>"]
+    LS_sql["ls_azure_sql<br/><sub>Azure SQL / Synapse for staging & analytics</sub>"]
   end
 
-  LS1 --> A1
-  A1 -->|file exists| A2
-  A2 --> LS2
-  A2 --> A3
-  A3 --> LS1
-  A3 --> A4
-  A4 --> LS2
-  A4 --> A5
+  subgraph Pipeline["pl-company-activity-daily<br/><sub>ADF orchestration (daily)</sub>"]
+    A1["getmeta_crm_file<br/><sub>check CRM file existence</sub>"]
+    A2["act-copy-crm-to-stg<br/><sub>Copy CSV → stg.crm_companies</sub>"]
+    A3["act-trigger_api_ingest<br/><sub>Call Azure Function / WebActivity<br/>to run fetch_product_usage</sub>"]
+    A4["act-copy-product-raw-to-stg<br/><sub>Copy NDJSON → stg.product_usage</sub>"]
+    A5["act-sp_merge_analytics<br/><sub>Run populate_analytics.sql<br/>(MERGE + computed metrics)</sub>"]
+    A6["act-notify_success<br/><sub>Success webhook / Teams / Email</sub>"]
+    AF["act-notify_failure<br/><sub>Failure webhook / Logic App</sub>"]
+  end
+
+  subgraph RawLayer["Raw / Staging"]
+    B1["raw/crm/ (Blob)<br/><sub>daily CRM CSV files</sub>"]
+    B2["product-api-raw (Blob)<br/><sub>NDJSON from API (date-partitioned)</sub>"]
+    S1["stg.crm_companies<br/><sub>raw CRM rows + provenance</sub>"]
+    S2["stg.product_usage<br/><sub>parsed usage rows + raw_json</sub>"]
+  end
+
+  subgraph DimAnalytic["Canonical & Analytics"]
+    D1["dim.companies<br/><sub>canonical company master</sub>"]
+    AN["analytics.company_activity_daily<br/><sub>denormalized daily metrics</sub>"]
+  end
+
+  %% Connections
+  KV1 -->|provides secrets to| LS_blob
+  KV1 -->|provides secrets to| LS_sql
+  KV1 -->|provides secrets to| A3
+
+  LS_blob --> B1
+  LS_blob --> B2
+
+  B1 --> A1
+  A1 -->|exists -> copy| A2
+  A2 --> S1
+  S1 --> A5
+  S1 --> D1
+
+  A3 -->|triggers script| B2
+  B2 --> A4
+  A4 --> S2
+  S2 --> A5
+
+  LS_sql --> S1
+  LS_sql --> S2
+  LS_sql --> D1
+  LS_sql --> AN
+
+  A5 --> D1
+  A5 --> AN
   A5 --> A6
-  A1 -- failure --> AF
-  A2 -- failure --> AF
-  A3 -- failure --> AF
-  A4 -- failure --> AF
-  A5 -- failure --> AF
+  A5 -- on failure --> AF
+
+  A1 -- on failure --> AF
+  A2 -- on failure --> AF
+  A3 -- on failure --> AF
+  A4 -- on failure --> AF
+
+  %% Styling: distinct colors for each category
+  classDef kvStyle fill:#f9c74f,stroke:#b58300,color:#000;
+  classDef linkedStyle fill:#90be6d,stroke:#4f8f36,color:#000;
+  classDef rawStyle fill:#89cff0,stroke:#1c6ea4,color:#000;
+  classDef stagingStyle fill:#f8961e,stroke:#b35b00,color:#000;
+  classDef procStyle fill:#f94144,stroke:#8b0000,color:#fff;
+  classDef dimStyle fill:#6a4c93,stroke:#3a1f5a,color:#fff;
+  classDef notifStyle fill:#577590,stroke:#2e4a6f,color:#fff;
+
+  class KV1 kvStyle;
+  class LS_blob,LS_sql linkedStyle;
+  class B1,B2 rawStyle;
+  class S1,S2 stagingStyle;
+  class A1,A2,A3,A4,A5,A6,AF procStyle;
+  class D1,AN dimStyle;
+  class A6,AF notifStyle;
+
+  %% Legend (rendered as text node)
+  Legend["**Legend**<br/>• Key Vault (secrets)<br/>• Linked Services (connectors)<br/>• Raw (blob storage)<br/>• Staging (landing tables)<br/>• Processing (ADF activities)<br/>• Dim & Analytics (final tables)"]
+  Legend --- KV1
