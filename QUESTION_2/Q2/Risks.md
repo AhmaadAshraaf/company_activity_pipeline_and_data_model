@@ -26,7 +26,8 @@ FROM (
 GROUP BY company_id, date;
 ```
 
-**Fix 2** — Use MERGE into an aggregates table
+**Fix 2** 
+- Use MERGE into an aggregates table
 (Store daily totals and update only changed dates.)
 ---
 ## 3. No data validation (NULLs, invalid dates, type drift)
