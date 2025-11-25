@@ -55,7 +55,7 @@ END;
 - This enables the incremental window:
 
 next_start_date = last_processed_date + 1
-
+```sql
 -- Create schema if missing
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'etl')
     EXEC('CREATE SCHEMA etl');
@@ -73,6 +73,7 @@ BEGIN
         CONSTRAINT PK_watermark PRIMARY KEY (job_name, processed_date)
     );
 END;
+```
 ---
 
 ## What to add (T-SQL sketch — paste into the job file)
