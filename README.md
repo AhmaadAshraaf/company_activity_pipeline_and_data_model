@@ -40,7 +40,8 @@ Once the Azure environment is fully configured, the pipeline runs in a simple da
 - **Confirm the run and trigger standard notifications**  
   Once checks look correct, let ADF complete its success notification (email/Teams/webhook). The pipeline is then ready for the next cycle.
   
-[<img width="2109" height="1672" alt="Untitled diagram-2025-11-24-233533" src="https://github.com/user-attachments/assets/34d9e302-5dd3-4467-b980-b576385e3556" />](https://github.com/AhmaadAshraaf/company_activity_pipeline_and_data_model/blob/main/adf/diagram.mmd)
+<img width="3475" height="3176" alt="Untitled diagram-2025-11-25-105501" src="https://github.com/user-attachments/assets/c9538c58-e1b7-4000-9f8c-2d89beaa2d33" />
+
 
 
 ---
