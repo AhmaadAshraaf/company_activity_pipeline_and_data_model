@@ -40,9 +40,20 @@ Once the Azure environment is fully configured, the pipeline runs in a simple da
 - **Confirm the run and trigger standard notifications**  
   Once checks look correct, let ADF complete its success notification (email/Teams/webhook). The pipeline is then ready for the next cycle.
 ---
-  
+
 <img width="3475" height="3176" alt="Untitled diagram-2025-11-25-105501" src="https://github.com/user-attachments/assets/c9538c58-e1b7-4000-9f8c-2d89beaa2d33" />
 
+## Architecture diagram — short explanation
+
+The diagram shows the daily Company Activity pipeline and the main components involved.
+
+- **Key Vault** stores secrets (API keys, blob and DB credentials) and is referenced by ADF and the ingestion step.  
+- **Blob Storage** holds raw inputs: the daily CRM CSV (`raw/crm/`) and NDJSON files produced by the product API (`product-api-raw/`), partitioned by date.  
+- **Staging** tables (`stg.crm_companies`, `stg.product_usage`) are the landing zone for parsed raw data — they preserve provenance and raw payloads for audit and reprocessing.  
+- **Dim / Analytics**: `dim.companies` is the canonical company master used for fast joins; `analytics.company_activity_daily` is the denormalized, one-row-per-company-per-day table with derived metrics for dashboards.  
+- **ADF Pipeline** (`pl-company-activity-daily`) orchestrates the flow: verify CRM file → copy CRM to staging → trigger API ingestion → copy API raw to staging → run SQL merge + metric calculations → send success/failure notifications.
+
+Design goals: clear separation of raw vs canonical vs analytic layers, idempotent MERGE operations for safe retries, and secrets managed through Key Vault for security.  
 
 
 ---
