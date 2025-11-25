@@ -17,7 +17,7 @@ source .venv/bin/activate
 .\\.venv\\Scripts\\Activate.ps1
 ```
 2. Install dependencies
-```
+```python
 pip install -r requirements.txt
 ```
 
@@ -131,6 +131,6 @@ echo "Then run the DDL and populate scripts in your SQL client."
 ```
 
 Make it executable locally:
-```
+```bash
 chmod +x run_once.sh
 ```
