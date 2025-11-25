@@ -64,13 +64,77 @@ Design goals: clear separation of raw vs canonical vs analytic layers, safe retr
 
 
 ---
+## Files of Interest
 
-## Files of interest
-- `sql/create_tables.sql` — DDL for staging and analytics.
-- `sql/populate_analytics.sql` — upsert + derived metrics.
-- `scripts/fetch_product_usage.py` — ingestion script (reads env or Key Vault).
-- `adf/diagram.mmd` — diagram for ADF flow.
-- `samples/` — sample CRM CSV and product API JSON.
+This section gives a quick overview of the key files in the repository and the role each one plays in the pipeline.
+
+### SQL Layer
+- **sql/create_tables.sql**  
+  Creates all pipeline tables: staging (`stg.*`), canonical dimension (`dim.companies`), and the analytics table (`analytics.company_activity_daily`).  
+  This defines the data model and the relationships between raw, cleaned, and analytics-ready data.
+
+- **sql/populate_analytics.sql**  
+  Main transformation logic. Merges CRM + product-usage staging data, computes daily analytics rows, and calculates derived metrics (rolling windows, churn risk, consistency, etc.).  
+  This script materializes the core dashboard dataset.
+
+### Ingestion & Utility Scripts
+- **scripts/fetch_product_usage.py**  
+  Ingestion client for the product usage API. Fetches usage for a given date range, normalizes it, and writes NDJSON files to Blob storage (or locally in mock mode).  
+  This is how product activity enters the pipeline.
+
+- **scripts/load_samples_to_sql.py**  
+  Optional utility for local development. Loads locally generated NDJSON files (mock mode outputs) into `stg.product_usage` without requiring Azure Data Factory.  
+  Useful for demos and local testing without cloud credentials.
+
+- **run_once.sh**  
+  Small wrapper to run a full local mock demo (generate NDJSON → view outputs).  
+  This helps quickly validate the pipeline behavior during development or showcase steps during a Loom walkthrough.
+
+### ADF & Diagram
+- **adf/diagram.mmd**  
+  Mermaid diagram of the entire pipeline: CRM ingestion, API ingestion, staging loads, analytics merge, and failure notifications.  
+  Shows orchestration and failure handling at a high level.
+
+### Documentation
+- **docs/company_activity_design.md**  
+  Data model explanation, table grain, column rationales, and design reasoning for staging → dim → analytics layers.
+
+- **docs/notes_components.md**  
+  Additional notes on components, decisions, and architectural choices.
+
+- **docs/DEMO.md**  
+  Step-by-step guide for running a full local demo using mock API mode.  
+  Allows running the pipeline without any real API keys or Azure services.
+
+- **docs/rollback.md**  
+  Short operational runbook showing how to safely rollback and re-run a single day’s analytics if there’s bad data.
+
+- **docs/answer_q5_30min.md**  
+  Concise answer for Question 5 (the 30-minute implementation plan) explaining prioritization, safe steps, and what to postpone.
+
+### Samples & Outputs
+- **samples/crm_sample.csv**  
+  Example CRM file used for local testing or demos.
+
+- **samples/product_api_sample.json**  
+  Mock product-usage API response used for `--mock` ingestion mode.
+
+- **samples_output/**  
+  Folder where mock NDJSON is written during local demo runs (gitignored for cleanliness).
+
+### Config & Meta
+- **.env.template**  
+  Template for required environment variables.  
+  Reviewers can copy it to `.env` and plug credentials when available.
+
+- **.gitignore**  
+  Prevents committing secrets, virtual environments, temporary files, and NDJSON outputs.
+
+- **requirements.txt**  
+  Python dependencies for ingestion scripts and local testing.
+
+- **README.md**  
+  Overview, run instructions, and pointers to diagrams and documentation files.
 
 ---
 ## Local demo and rollback
