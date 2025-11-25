@@ -64,3 +64,11 @@ Design goals: clear separation of raw vs canonical vs analytic layers, idempoten
 - `scripts/fetch_product_usage.py` — ingestion script (reads env or Key Vault).
 - `adf/diagram.mmd` — diagram for ADF flow.
 - `samples/` — sample CRM CSV and product API JSON.
+
+---
+## Local demo and rollback
+
+- For a quick local demo (no cloud keys), follow `docs/DEMO.md`. It shows how to run the ingestion in `--mock` mode and validate results.
+- If you need to rollback a single day's analytics, use `docs/rollback.md`.
+- For a scripted demo, use `./run_once.sh <date>` which runs the mock ingest and saves NDJSON to `samples_output/`.
+
