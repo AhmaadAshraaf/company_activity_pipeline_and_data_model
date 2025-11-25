@@ -53,11 +53,3 @@ The daily load began taking much longer than expected. A process that normally f
   - schema mismatches  
 
 After these changes the pipeline stabilized and ran consistently within a few minutes, even during peak data-submission periods.
-
----
-
-### Why this example matters
-It demonstrates:
-- How performance issues often come from *upstream behavior* (API throttling, unbounded scans), not only infrastructure.
-- How incremental design and batching dramatically improve pipeline speed.
-- The value of structured debugging: logs → metrics → traces → schema checks.
