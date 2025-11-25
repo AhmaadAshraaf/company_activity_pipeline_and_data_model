@@ -59,7 +59,7 @@ GROUP BY company_id, date;
 
 > This optimisation is especially useful for very large tables where date-selective queries are frequent.
 
-- Why it must be ranked #3 (summary)
+- Why it must be ranked #3 ?
 
 1. It boosts performance, but does not change the fundamental amount of data scanned unless combined with incremental logic.
 
