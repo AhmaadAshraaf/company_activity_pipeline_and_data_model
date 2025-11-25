@@ -1,7 +1,3 @@
-### C — `run_once.sh` (simple wrapper for demo runs)
-
-- This is a simple script to run the mock demo. Adjust if you want to call real services later.
-
 ```bash
 #!/usr/bin/env bash
 # run_once.sh - demo wrapper (mock mode)
@@ -27,8 +23,8 @@ echo "Done. Next: load samples to SQL (optional) and run SQL scripts."
 echo "To load to SQL (if configured): python scripts/load_samples_to_sql.py --path samples_output"
 echo "Then run the DDL and populate scripts in your SQL client."
 ```
----
-- Make it executable locally:
+# Make it executable locally:
+
 ```bash
 chmod +x run_once.sh
 ```
