@@ -40,10 +40,9 @@ Once the Azure environment is fully configured, the pipeline runs in a simple da
 - **Confirm the run and trigger standard notifications**  
   Once checks look correct, let ADF complete its success notification (email/Teams/webhook). The pipeline is then ready for the next cycle.
 ---
+## Architecture diagram
 
 <img width="3475" height="3176" alt="Untitled diagram-2025-11-25-105501" src="https://github.com/user-attachments/assets/c9538c58-e1b7-4000-9f8c-2d89beaa2d33" />
-
-## Architecture diagram
 
 The diagram shows the daily Company Activity pipeline and the main components involved.
 
@@ -53,7 +52,15 @@ The diagram shows the daily Company Activity pipeline and the main components in
 - **Dim / Analytics**: `dim.companies` is the canonical company master used for fast joins; `analytics.company_activity_daily` is the denormalized, one-row-per-company-per-day table with derived metrics for dashboards.  
 - **ADF Pipeline** (`pl-company-activity-daily`) orchestrates the flow: verify CRM file → copy CRM to staging → trigger API ingestion → copy API raw to staging → run SQL merge + metric calculations → send success/failure notifications.
 
-Design goals: clear separation of raw vs canonical vs analytic layers, idempotent MERGE operations for safe retries, and secrets managed through Key Vault for security.  
+### Failure handling (short)
+- **Local retries & idempotency:** Copy and merge steps are idempotent (MERGE by `company_id, activity_date`) so a safe re-run fixes transient issues without duplicating data.  
+- **Retries:** Each ADF activity should have retry settings (e.g., 3 attempts with backoff) for transient network/API failures. The ingestion script (`fetch_product_usage.py`) implements simple retry/backoff for API calls.  
+- **Centralized alerts:** All activity failure paths route to the same failure notification (`act-notify_failure`) which triggers a Logic App / webhook to post details to Teams/email, including pipeline name, failing activity, run id, and error message.  
+- **Quick rollback:** If bad data lands in analytics for a date, a controlled rollback is `DELETE FROM analytics.company_activity_daily WHERE activity_date = '<date>'` followed by a re-run from staging. `docs/rollback.md` contains the exact steps.  
+- **Observability:** Staging tables include provenance fields (`file_date`, `src_file_name`, `ingested_at`, `raw_json`) and a `data_quality_flag` in analytics to surface partial or low-confidence runs for human review.
+
+Design goals: clear separation of raw vs canonical vs analytic layers, safe retries and idempotency for operations, centralized alerting, and an easy rollback path for operational safety.
+
 
 
 ---
