@@ -3,14 +3,15 @@
 **Change to make (one-file edit):**  
 Add a **materialization / CTAS (Create Table As Select)** step that narrows and pre-structures the raw events for the date window being processed, then run the `GROUP BY` against this much smaller, partition-friendly table. Insert the CTAS + subsequent aggregation into the same SQL job file you can edit in 30 minutes.
 
-> If your repo uses `stg.product_usage` instead of `fact_events`, replace `fact_events` with `stg.product_usage` in the snippets below.
-
 ---
 
 ## Why this is #2
 - **High impact when raw table is wide or contains heavy payloads (JSON):** CTAS reduces IO by projecting only the required columns and applying initial normalization (casts, timezone -> DATE), which makes the heavy `GROUP BY` much faster.  
 - **Safe & reversible:** You create a temp/short-lived table for the window being processed (idempotent create/drop), so it has low blast radius.  
 - **One-file edit:** You can add CTAS creation and use it immediately in the same job file without changing other pipeline components.
+
+> CTAS is the second-best optimisation because it delivers strong performance gains **only after** you control the size of the data being processed. Its main benefit comes from reducing I/O by stripping wide payloads (e.g., JSON or unnecessary columns) into a smaller, partition-friendly table before aggregation. This makes the GROUP BY step much faster, but it still depends on how much data we scan.
+In contrast, Rank #1 removes unnecessary full-history scans entirely — that’s a deeper, more systemic win. CTAS then becomes the next logical enhancement: once the job is incremental, CTAS makes the remaining per-day or per-window processing even more efficient without touching other parts of the pipeline.
 
 ---
 
