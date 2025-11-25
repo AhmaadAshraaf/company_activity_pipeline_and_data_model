@@ -43,7 +43,7 @@ Once the Azure environment is fully configured, the pipeline runs in a simple da
 
 <img width="3475" height="3176" alt="Untitled diagram-2025-11-25-105501" src="https://github.com/user-attachments/assets/c9538c58-e1b7-4000-9f8c-2d89beaa2d33" />
 
-## Architecture diagram — short explanation
+## Architecture diagram
 
 The diagram shows the daily Company Activity pipeline and the main components involved.
 
