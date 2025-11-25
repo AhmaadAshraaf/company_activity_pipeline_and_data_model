@@ -1,4 +1,4 @@
-# Q2.1 — Rank #1 optimisation (30-minute, one-file change)
+# Q2.1 — Rank #1 optimisation
 
 **Change to make (one-file edit):**  
 Convert the full-table `GROUP BY` into an **incremental aggregation** that processes only new/unprocessed dates using a watermark, and `MERGE`s results into a persistent aggregates table (`agg.daily_company_events`). Implement this by updating the existing SQL job file that currently runs the full aggregation.
