@@ -57,7 +57,7 @@ Notes:
 Create `docs/rollback.md`:
 
 ```markdown
-# Rollback & Retry (short runbook)
+# Rollback & Retry
 
 If a daily run produced incorrect data for a specific date, follow these steps to rollback and retry safely.
 
