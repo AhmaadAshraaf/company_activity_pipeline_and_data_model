@@ -53,8 +53,7 @@ END;
 
 - Tracks the last date successfully processed by the job.
 - This enables the incremental window:
-
-next_start_date = last_processed_date + 1
+```next_start_date = last_processed_date + 1```
 ```sql
 -- Create schema if missing
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'etl')
